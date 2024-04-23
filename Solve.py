@@ -50,7 +50,7 @@ class ACO:
         :return:
         """
         print('----------------------------------------------------')
-        print('| Iteration |          Distance           |   Time  |')
+        print('| Iteration |          Distance          |   Time  |')
         print('-----------------------------------------------------')
         start_time = time.time()
         # The maximum number of iterations
