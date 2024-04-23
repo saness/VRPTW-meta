@@ -3,7 +3,7 @@ from Solve import ACO
 
 
 if __name__ == '__main__':
-    file_path = './solomon-100/r205.txt'
+    file_path = './solomon-100/c107.txt'
     ants = 10
     maximum_iteration = 200
     beta = 2
@@ -11,6 +11,5 @@ if __name__ == '__main__':
     show_figure = False
 
     graph = Graph(file_path)
-    basic_aco = ACO(graph, ants=ants, maximum_iteration=maximum_iteration, beta=beta, q0=q0)
-
-    basic_aco.run_basic_aco()
+    algo = ACO(graph, ants=ants, maximum_iteration=maximum_iteration, beta=beta, q0=q0)
+    algo.ant_colony_optimization()

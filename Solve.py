@@ -1,10 +1,8 @@
 import numpy as np
 import random
 from graph import Graph
-from Path import Path
 from Agent import Agent
 from threading import Thread
-from queue import Queue
 import time
 
 
@@ -28,21 +26,30 @@ class ACO:
         self.best_path = None
         self.best_vehicle_number = None
 
+    def find_best_path(self, paths_distance, ants, start_iteration, iter, start_time):
+        best_index = np.argmin(paths_distance)
+        if self.best_path is None or paths_distance[best_index] < self.best_distance:
+            best_ant = ants[int(best_index)]
+            self.best_path, self.best_distance = best_ant.path,paths_distance[best_index]
+            self.best_vehicle_number = self.best_path.count(0) - 1
+            start_iteration = iter
+            time_running = time.time() - start_time
+            print("|     {}     |      {}     |   {:.3f}  |".format(iter, self.best_distance, time_running))
+            # print('\n')
+            # print(f'[iteration {iter}]: The improved path distance is {self.best_distance}')
+            # print(f'It took {time.time() - start_time:.3f} second running the ant colony algorithm')
 
-    def run_basic_aco(self):
-        # Start a thread to run _basic_aco and use the main thread to draw
-        basic_aco_thread = Thread(target=self.ant_colony_optimization)
-        basic_aco_thread.start()
-        basic_aco_thread.join()
-
+        return self.best_path, self.best_distance, start_iteration
 
     def ant_colony_optimization(self):
         """
         The most basic ant colony algorithm
         :return:
         """
+        print('----------------------------------------------------')
+        print('| Iteration |          Distance          |   Time  |')
+        print('-----------------------------------------------------')
         start_time = time.time()
-
         # The maximum number of iterations
         start_iteration = 0
         for iter in range(self.maximum_iteration):
@@ -57,10 +64,8 @@ class ACO:
                     next_index = self.chose_next(ants[j])
                     # Determine whether the constraint conditions are still satisfied after adding the position.
                     # If not, select it again and then make the judgment again.
-                    if not ants[j].check(next_index):
-                        next_index = self.chose_next(ants[j])
-                        if not ants[j].check(next_index):
-                            next_index = 0
+                    checked = ants[j].check(next_index)
+                    if not checked and not ants[j].check(next_index := self.chose_next(ants[j])):next_index = 0
 
                     # Update ant path
                     ants[j].travel_to_next(next_index)
@@ -71,32 +76,25 @@ class ACO:
                 self.graph.update_local_pheromone(ants[j].index, 0)
 
             # Calculate the path length of all ants
-            paths_distance = np.array([ant.total_distance for ant in ants])
+            paths_distance = np.array(list(map(lambda ant: ant.total_distance, ants)))
 
             # Record the current best path
-            best_index = np.argmin(paths_distance)
-            if self.best_path is None or paths_distance[best_index] < self.best_distance:
-                self.best_path = ants[int(best_index)].path
-                self.best_distance = paths_distance[best_index]
-                self.best_vehicle_number = self.best_path.count(0) - 1
-                start_iteration = iter
-
-                print('\n')
-                print('[iteration %d]: find a improved path, its distance is %f' % (iter, self.best_distance))
-                print('it takes %0.3f second running' % (time.time() - start_time))
+            self.best_path,self.best_distance, start_iteration \
+                = self.find_best_path(paths_distance, ants, start_iteration, iter, start_time)
 
             # Update pheromone table
             self.graph.update_global_pheromone(self.best_path, self.best_distance)
 
-            given_iteration = 100
-            if iter - start_iteration > given_iteration:
+            if iter - start_iteration > 100:
                 print('\n')
-                print('iteration exit: can not find better solution in %d iteration' % given_iteration)
+                print('Cannot find better solution in %d iteration' % 100)
                 break
 
         print('\n')
-        print('final best path distance is %f, number of vehicle is %d' % (self.best_distance, self.best_vehicle_number))
-        print('it takes %0.3f second running' % (time.time() - start_time))
+        print(f'Final best path distance is: {self.best_distance}')
+        print(f'Number of vehicles is: {self.best_vehicle_number}')
+        print(f'Algorithm runtime: {time.time() - start_time:.3f}')
+
 
 
     def calculate_transition_probability(self, index, indexes):
@@ -127,7 +125,6 @@ class ACO:
         """
         # calculate N and max fitness value
         N = len(indexes)
-
         # normalize
         normal_transition_prob = transition_probability/np.sum(transition_probability)
 
