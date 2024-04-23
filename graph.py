@@ -33,6 +33,11 @@ class Graph:
                                       float(customer[4]), float(customer[5]), float(customer[6])))
 
         customer_distance_matrix = np.zeros((customer_numbers, customer_numbers))
+        customer_distance_matrix = Graph.calculate_distance_matrix(customer_numbers, customer_distance_matrix, customers)
+
+        return customer_numbers, customers, customer_distance_matrix, vehicle_number, vehicle_capacity
+
+    def calculate_distance_matrix(self,customer_numbers, customer_distance_matrix, customers):
         for i in range(customer_numbers):
             customer_1 = customers[i]
             customer_distance_matrix[i][i] = 1e-8
@@ -41,7 +46,7 @@ class Graph:
                 customer_distance_matrix[i][j] = Graph.calculate_distance(customer_1, customer_2)
                 customer_distance_matrix[j][i] = customer_distance_matrix[i][j]
 
-        return customer_numbers, customers, customer_distance_matrix, vehicle_number, vehicle_capacity
+        return customer_distance_matrix
 
     def nearest_heuristic(self,maximum_vehicle_number = None):
         indexes = []
@@ -60,30 +65,29 @@ class Graph:
         while len(indexes) > 0 and maximum_vehicle_number > 0:
             nearest_index = self.calculate_nearest_index(indexes, index, load, time)
 
-            if nearest_index is None:
+            if nearest_index is not None:
+                load += self.customers[nearest_index].demand
+                distance = self.customer_distance_matrix[index][nearest_index]
+                waiting_time = max(self.customers[nearest_index].ready_time - time - distance, 0)
+                service_time = self.customers[nearest_index].service_time
+                time += distance + waiting_time + service_time
+
+                total_distance += self.customer_distance_matrix[index][nearest_index]
+                path.append(nearest_index)
+                index = nearest_index
+                indexes.remove(nearest_index)
+            else:
                 total_distance += self.customer_distance_matrix[index][0]
                 load = 0
                 time = 0
                 path.append(0)
                 index = 0
                 maximum_vehicle_number -= 1
-            else:
-                load += self.customers[nearest_index].demand
-
-                distance = self.customer_distance_matrix[index][nearest_index]
-                wait = max(self.customers[nearest_index].ready_time - time - distance, 0)
-                service_time = self.customers[nearest_index].service_time
-                time += distance + wait + service_time
-                indexes.remove(nearest_index)
-
-                total_distance += self.customer_distance_matrix[index][nearest_index]
-                path.append(nearest_index)
-                index = nearest_index
 
         total_distance += self.customer_distance_matrix[index][0]
         path.append(0)
-
         vehicle_number = path.count(0) - 1
+
         return path, total_distance, vehicle_number
 
 
@@ -97,13 +101,11 @@ class Graph:
                 continue
 
             distance = self.customer_distance_matrix[index][i]
-            wait = max(self.customers[i].ready_time - time-distance, 0)
+            waiting_time = max(self.customers[i].ready_time - time-distance, 0)
             service_time = self.customers[i].service_time
+            total_time = time + distance + waiting_time + service_time + self.customer_distance_matrix[i][0]
 
-            if time + distance + wait + service_time + self.customer_distance_matrix[i][0] > self.customers[0].due_date:
-                continue
-
-            if time + distance > self.customers[i].due_date:
+            if total_time > self.customers[0].due_date or time + distance > self.customers[i].due_date:
                 continue
 
             if nearest_distance is None or self.customer_distance_matrix[index][i] < nearest_distance:
@@ -120,11 +122,12 @@ class Graph:
         self.pheromone_matrix[i][j] = (1-self.rho) * self.pheromone_matrix[i][j] + self.rho * self.pheromone_value
 
     def update_global_pheromone(self, path, distance):
-        self.pheromone_matrix = (1-self.rho) * self.pheromone_matrix
+        pheromone_increase = self.rho/distance
+        self.pheromone_matrix *= (1-self.rho)
 
         index = path[0]
         for i in path[1:]:
-            self.pheromone_matrix[index][i] += self.rho/distance
+            self.pheromone_matrix[index][i] += pheromone_increase
             index = i
 
 
