@@ -10,9 +10,8 @@ class Graph:
         self.nearest_travel_path, self.pheromone_value, _ = self.nearest_heuristic()
         self.pheromone_value = (1/self.pheromone_value * self.customer_numbers)
 
-        self.pheromone_matrix = np.ones((self.customer_numbers, self.customers)) * self.pheromone_value
+        self.pheromone_matrix = np.ones((self.customer_numbers, self.customer_numbers)) * self.pheromone_value
         self.information_matrix = 1/ self.customer_distance_matrix
-
 
 
     def create_customer(self, file_path):
@@ -37,7 +36,8 @@ class Graph:
 
         return customer_numbers, customers, customer_distance_matrix, vehicle_number, vehicle_capacity
 
-    def calculate_distance_matrix(self,customer_numbers, customer_distance_matrix, customers):
+    @staticmethod
+    def calculate_distance_matrix(customer_numbers, customer_distance_matrix, customers):
         for i in range(customer_numbers):
             customer_1 = customers[i]
             customer_distance_matrix[i][i] = 1e-8
@@ -47,6 +47,13 @@ class Graph:
                 customer_distance_matrix[j][i] = customer_distance_matrix[i][j]
 
         return customer_distance_matrix
+
+    def helper_function(self, index, time, distance):
+        waiting_time = max(self.customers[index].ready_time - time - distance, 0)
+        service_time = self.customers[index].service_time
+        all_time = distance + waiting_time + service_time
+
+        return all_time
 
     def nearest_heuristic(self,maximum_vehicle_number = None):
         indexes = []
@@ -68,9 +75,9 @@ class Graph:
             if nearest_index is not None:
                 load += self.customers[nearest_index].demand
                 distance = self.customer_distance_matrix[index][nearest_index]
-                waiting_time = max(self.customers[nearest_index].ready_time - time - distance, 0)
-                service_time = self.customers[nearest_index].service_time
-                time += distance + waiting_time + service_time
+
+                all_time = self.helper_function(nearest_index, time, distance)
+                time += all_time
 
                 total_distance += self.customer_distance_matrix[index][nearest_index]
                 path.append(nearest_index)
@@ -90,8 +97,6 @@ class Graph:
 
         return path, total_distance, vehicle_number
 
-
-
     def calculate_nearest_index(self, indexes, index, load, time):
         nearest_index = None
         nearest_distance = None
@@ -101,9 +106,8 @@ class Graph:
                 continue
 
             distance = self.customer_distance_matrix[index][i]
-            waiting_time = max(self.customers[i].ready_time - time-distance, 0)
-            service_time = self.customers[i].service_time
-            total_time = time + distance + waiting_time + service_time + self.customer_distance_matrix[i][0]
+            all_time = self.helper_function(i, time, distance)
+            total_time = time + all_time + self.customer_distance_matrix[i][0]
 
             if total_time > self.customers[0].due_date or time + distance > self.customers[i].due_date:
                 continue
@@ -115,7 +119,7 @@ class Graph:
         return nearest_index
 
     @staticmethod
-    def calculate_distance(self, customer_1, customer_2):
+    def calculate_distance(customer_1, customer_2):
         return np.linalg.norm((customer_1.x - customer_2.x, customer_1.y - customer_2.y))
 
     def update_local_pheromone(self, i, j):
