@@ -1,5 +1,8 @@
 import numpy as np
 import random
+
+from pip._internal.utils.misc import tabulate
+
 from graph import Graph
 from Agent import Agent
 from threading import Thread
@@ -47,7 +50,7 @@ class ACO:
         :return:
         """
         print('----------------------------------------------------')
-        print('| Iteration |          Distance          |   Time  |')
+        print('| Iteration |          Distance           |   Time  |')
         print('-----------------------------------------------------')
         start_time = time.time()
         # The maximum number of iterations
@@ -93,7 +96,7 @@ class ACO:
         print('\n')
         print(f'Final best path distance is: {self.best_distance}')
         print(f'Number of vehicles is: {self.best_vehicle_number}')
-        print(f'Algorithm runtime: {time.time() - start_time:.3f}')
+        print(f'Algorithm runtime: {time.time() - start_time:.3f} seconds')
 
 
 
