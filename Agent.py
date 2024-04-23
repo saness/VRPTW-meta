@@ -54,6 +54,6 @@ class Agent:
 
         return True
 
-    def index_to_visit_empty(self):
+    def is_empty(self):
         return len(self.indexes) == 0
 
