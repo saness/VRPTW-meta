@@ -12,5 +12,5 @@ class Path:
             self.distance = copy.deepcopy(distance)
             self.vehicle_number = self.path.count(0) - 1
 
-    def get_path_info(self):
+    def get_info(self):
         return self.path, self.distance, self.vehicle_number
