@@ -5,7 +5,7 @@ from pip._internal.utils.misc import tabulate
 
 from graph import Graph
 from Agent import Agent
-from threading import Thread
+from threading import Thread, Event
 import time
 
 
@@ -38,9 +38,6 @@ class ACO:
             start_iteration = iter
             time_running = time.time() - start_time
             print("|     {}     |      {}     |   {:.3f}  |".format(iter, self.best_distance, time_running))
-            # print('\n')
-            # print(f'[iteration {iter}]: The improved path distance is {self.best_distance}')
-            # print(f'It took {time.time() - start_time:.3f} second running the ant colony algorithm')
 
         return self.best_path, self.best_distance, start_iteration
 
@@ -78,6 +75,7 @@ class ACO:
                 ants[j].travel_to_next(0)
                 self.graph.update_local_pheromone(ants[j].index, 0)
 
+
             # Calculate the path length of all ants
             paths_distance = np.array(list(map(lambda ant: ant.total_distance, ants)))
 
@@ -87,6 +85,7 @@ class ACO:
 
             # Update pheromone table
             self.graph.update_global_pheromone(self.best_path, self.best_distance)
+            self.apply_local_search(ants, self.graph.customer_distance_matrix)
 
             if iter - start_iteration > 100:
                 print('\n')
@@ -118,6 +117,8 @@ class ACO:
 
         return next_index
 
+
+
     @staticmethod
     def roulette_selection(indexes, transition_probability):
         """
@@ -137,3 +138,66 @@ class ACO:
             index = int(N * random.random())
             if random.random() <= normal_transition_prob[index]: return indexes[index]
 
+    def two_opt_move(self, route, distance_matrix):
+        best_route = route.copy()
+        best_distance = self.calculate_route_distance(best_route, distance_matrix)
+
+        for i in range(1, len(route) - 2):
+            for j in range(i + 1, len(route)):
+                new_route = route.copy()
+                new_route[i:j] = reversed(new_route[i:j])
+                new_distance = self.calculate_route_distance(new_route, distance_matrix)
+
+                if new_distance < best_distance:
+                    best_route = new_route
+                    best_distance = new_distance
+
+        return best_route, best_distance
+
+    def calculate_route_distance(self,route, distance_matrix):
+        total_distance = 0
+        for i in range(len(route) - 1):
+            node1, node2 = route[i], route[i + 1]
+            total_distance += distance_matrix[node1][node2]
+        return total_distance
+
+    def apply_local_search(self, ants, distance_matrix):
+        for ant in ants:
+            path = ant.path
+            routes = self.get_routes_from_path(path)
+            improved_routes = []
+
+            for route in routes:
+                improved_route, improved_distance = self.two_opt_move(route, distance_matrix)
+                improved_routes.append(improved_route)
+
+            ant.path = self.flatten_routes(improved_routes)
+            ant.total_distance = self.calculate_path_distance(ant.path, distance_matrix)
+
+    def get_routes_from_path(self, path):
+        routes = []
+        current_route = []
+        for node in path:
+            if node == 0:
+                if current_route:
+                    routes.append(current_route)
+                    current_route = []
+            else:
+                current_route.append(node)
+        if current_route:
+            routes.append(current_route)
+        return routes
+
+    def flatten_routes(self, routes):
+        flattened_path = []
+        for route in routes:
+            flattened_path.extend(route)
+            flattened_path.append(0)
+        return flattened_path[:-1]
+
+    def calculate_path_distance(self,path, distance_matrix):
+        total_distance = 0
+        for i in range(len(path) - 1):
+            node1, node2 = path[i], path[i + 1]
+            total_distance += distance_matrix[node1][node2]
+        return total_distance

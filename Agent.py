@@ -1,3 +1,6 @@
+import copy
+from threading import Event
+
 from graph import Graph
 
 
@@ -56,4 +59,3 @@ class Agent:
 
     def is_empty(self):
         return len(self.indexes) == 0
-
