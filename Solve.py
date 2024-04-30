@@ -94,7 +94,7 @@ class ACO:
 
             if iter - start_iteration > 500:
                 print('\n')
-                print('Cannot find better solution in %d iteration' % 100)
+                print('Cannot find better solution in %d iteration' % 500)
                 break
 
         print('\n')
