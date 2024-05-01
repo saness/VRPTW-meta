@@ -13,14 +13,19 @@ class Agent:
         """
         super()
         self.graph = graph
+        # current index
         self.index = start
+        # vehicle load
         self.load = 0
+        # vehicle travel time
         self.time = 0
+        # vehicle travel path
         self.path = [start]
         self.arrival_time = [0]
         self.indexes = list(range(graph.customer_numbers))
-        # nodes left to visit
+        # nodes to visit
         self.indexes.remove(start)
+        # total travel distance
         self.total_distance = 0
 
     def helper_function(self, next_index, distance):
@@ -47,9 +52,11 @@ class Agent:
         distance = self.graph.customer_distance_matrix[self.index][next_index]
         self.arrival_time.append(self.time + distance)
 
+        # If the next location is a server point, the vehicle load, etc. must be cleared.
         if self.graph.customers[next_index].is_depot:
             self.load = 0
             self.time = 0
+        # Update vehicle load, travel distance, time
         else:
             self.load += self.graph.customers[next_index].demand
             all_time = self.helper_function(next_index, distance)
@@ -74,6 +81,8 @@ class Agent:
         total_time = self.time + all_time + self.graph.customer_distance_matrix[next_index][0]
         due_time = self.graph.customers[0].due_date
 
+        # Checks if you can return to service store after visiting a passenger or
+        # Checks if the vehicle reaches after due time
         if total_time > due_time or self.time + distance > due_time:
             return False
 
