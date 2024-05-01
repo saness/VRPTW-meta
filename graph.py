@@ -88,10 +88,15 @@ class Graph:
         :param maximum_vehicle_number: maximum number of vehicles
         :return: path and total distance to nearest node
         """
+        # nodes to visit
         indexes = []
+        # current index
         index = 0
+        # current load
         load = 0
+        # current time
         time = 0
+        # total distance
         total_distance = 0
         path = [0]
 
@@ -112,8 +117,11 @@ class Graph:
                 time += all_time
 
                 total_distance += self.customer_distance_matrix[index][nearest_index]
+                # add node to path
                 path.append(nearest_index)
+                # change the current index to nearest node
                 index = nearest_index
+                # remove visited index
                 indexes.remove(nearest_index)
             else:
                 total_distance += self.customer_distance_matrix[index][0]
@@ -148,10 +156,12 @@ class Graph:
             distance = self.customer_distance_matrix[index][i]
             all_time = self.helper_function(i, time, distance)
             total_time = time + all_time + self.customer_distance_matrix[i][0]
-
+            # Checks if you can return to service store after visiting a passenger or
+            # Checks if the vehicle reaches after due time
             if total_time > self.customers[0].due_date or time + distance > self.customers[i].due_date:
                 continue
 
+            # comparing nearest node with current next node
             if nearest_distance is None or self.customer_distance_matrix[index][i] < nearest_distance:
                 nearest_distance = self.customer_distance_matrix[index][i]
                 nearest_index = i
