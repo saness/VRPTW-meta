@@ -107,8 +107,6 @@ class ACO:
             # Update pheromone table
             self.graph.update_global_pheromone(self.best_path, self.best_distance)
 
-            # self.local_search_procedure(ants)
-
             if iter - start_iteration > 500:
                 print('\n')
                 print('Cannot find better solution in %d iteration' % 500)
@@ -138,7 +136,9 @@ class ACO:
         :param ant: ant or vehicle
         :return: the next node or index to visit
         """
+        # current index
         index = ant.index
+        # indexes to visit
         indexes = ant.indexes
 
         transition_probability = self.calculate_transition_probability(index, indexes)

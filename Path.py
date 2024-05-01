@@ -1,6 +1,4 @@
 import copy
-
-
 class Path:
     def __init__(self, path, distance):
         if path is None:
