@@ -3,8 +3,6 @@ import copy
 import numpy as np
 import random
 
-from pip._internal.utils.misc import tabulate
-
 from graph import Graph
 from Agent import Agent
 from threading import Thread, Event
@@ -13,6 +11,14 @@ import time
 
 class ACO:
     def __init__(self, graph: Graph, ants=10, maximum_iteration=200, beta=2, q0=0.1):
+        """
+        Constructor to the class
+        :param graph: the ant colony graph
+        :param ants: ants or vehicles
+        :param maximum_iteration: maximum number of iterations
+        :param beta: relative importance of heuristic value
+        :param q0: probability of selecting next point
+        """
         super()
         # The location and service time information of graph nodes
         self.graph = graph
@@ -26,12 +32,23 @@ class ACO:
         self.beta = beta
         # q0 represents the probability of directly selecting the next point with the highest probability
         self.q0 = q0
-        # best path
+        # best path distance
         self.best_distance = None
+        # best rout
         self.best_path = None
+        # least number of vehicles
         self.best_vehicle_number = None
 
     def find_best_path(self, paths_distance, ants, start_iteration, iter, start_time):
+        """
+        Finds the best path and its corresponding distance
+        :param paths_distance: the total distance travelled by ants
+        :param ants: ants
+        :param start_iteration: starting iteration
+        :param iter: the current iteration
+        :param start_time: the starting time
+        :return: best path, distance and start iteration
+        """
         best_index = np.argmin(paths_distance)
         if self.best_path is None or paths_distance[best_index] < self.best_distance:
             best_ant = ants[int(best_index)]
@@ -45,8 +62,8 @@ class ACO:
 
     def ant_colony_optimization(self):
         """
-        The most basic ant colony algorithm
-        :return:
+        Implements the ant colony algorithm
+        :return: None
         """
         print('----------------------------------------------------')
         print('| Iteration |          Distance          |   Time  |')
@@ -55,8 +72,9 @@ class ACO:
         # The maximum number of iterations
         start_iteration = 0
         for iter in range(self.maximum_iteration):
-            # Set the current vehicle load, current travel distance, and current time for each ant
+            # initializing the ants
             ants = []
+            # Set the current vehicle load, current travel distance, and current time for each ant
             for _ in range(self.ants):
                 ants.append(Agent(self.graph))
 
@@ -76,9 +94,6 @@ class ACO:
                 # Finally return to 0 position
                 ants[j].travel_to_next(0)
                 self.graph.update_local_pheromone(ants[j].index, 0)
-                # ants[j].local_search_procedure()
-
-
 
             # Calculate the path length of all ants
             paths_distance = np.array(list(map(lambda ant: ant.total_distance, ants)))
@@ -86,6 +101,8 @@ class ACO:
             # Record the current best path
             self.best_path,self.best_distance, start_iteration \
                 = self.find_best_path(paths_distance, ants, start_iteration, iter, start_time)
+
+            # local search procedure to refine the paths and distance found by the ants
             self.apply_local_search(ants, self.graph.customer_distance_matrix)
             # Update pheromone table
             self.graph.update_global_pheromone(self.best_path, self.best_distance)
@@ -105,11 +122,22 @@ class ACO:
 
 
     def calculate_transition_probability(self, index, indexes):
+        """
+        Calculates the probability of choosing the next node or customer
+        :param index: current index
+        :param indexes: all the nodes left to visit
+        :return: the probability of choosing the next node
+        """
         transition_probability = self.graph.pheromone_matrix[index][indexes] * \
                                  np.power(self.graph.information_matrix[index][indexes], self.beta)
         return transition_probability / np.sum(transition_probability)
 
     def chose_next(self, ant):
+        """
+        Chooses the next node or index to travel
+        :param ant: ant or vehicle
+        :return: the next node or index to visit
+        """
         index = ant.index
         indexes = ant.indexes
 
@@ -127,23 +155,29 @@ class ACO:
     @staticmethod
     def roulette_selection(indexes, transition_probability):
         """
-        Roulette
-        :param indexes: a list of N index (list or tuple)
-        :param transition_probability:
-        :return: selected index
+        Roulette way of selecting index
+        :param indexes: a list of N index or nodes
+        :param transition_probability: the transition probability
+        :return: index to move to
         """
         # calculate N and max fitness value
         N = len(indexes)
         # normalize
         normal_transition_prob = transition_probability/np.sum(transition_probability)
 
-        # select: O(1)
         while True:
             # randomly select an individual with uniform probability
             index = int(N * random.random())
             if random.random() <= normal_transition_prob[index]: return indexes[index]
 
     def two_opt_move(self, route, distance_matrix):
+        """
+        Tries all 2 opt moves in the route and returns the best route and its corresponding distance
+        Removes two non-adjacent edges from a route and reconnects the two resulting sub-routes in the opposite order.
+        :param route: route
+        :param distance_matrix: the distance matrix
+        :return: best route and its corresponding distance
+        """
         best_route = route.copy()
         best_distance = self.calculate_route_distance(best_route, distance_matrix)
 
@@ -160,6 +194,12 @@ class ACO:
         return best_route, best_distance
 
     def calculate_route_distance(self,route, distance_matrix):
+        """
+        Calculate the total distance of given route,
+        :param route: route
+        :param distance_matrix: distance matrix
+        :return:total distance
+        """
         total_distance = 0
         for i in range(len(route) - 1):
             node1, node2 = route[i], route[i + 1]
@@ -167,6 +207,12 @@ class ACO:
         return total_distance
 
     def apply_local_search(self, ants, distance_matrix):
+        """
+        Applies local search procedure to all ants after the tour is complete
+        :param ants: ants
+        :param distance_matrix: distance matrix
+        :return: None
+        """
         for ant in ants:
             path = ant.path
             routes = self.get_routes_from_path(path)
@@ -180,6 +226,11 @@ class ACO:
             ant.total_distance = self.calculate_path_distance(ant.path, distance_matrix)
 
     def get_routes_from_path(self, path):
+        """
+        Separates the path into individual routes, where each route starts and ends at the depot
+        :param path: Path
+        :return: a list of routes
+        """
         routes = []
         current_route = []
         for node in path:
@@ -194,6 +245,11 @@ class ACO:
         return routes
 
     def flatten_routes(self, routes):
+        """
+        combines all the individual routes into a single path by flattening the list of routes,
+        :param routes: routes
+        :return: Single path
+        """
         flattened_path = []
         for route in routes:
             flattened_path.extend(route)
@@ -202,6 +258,12 @@ class ACO:
 
 
     def calculate_path_distance(self,path, distance_matrix):
+        """
+        Calculates the total distance of the given path by summing the distances between consecutive nodes in the path,
+        :param path: path
+        :param distance_matrix: distance matrix
+        :return:
+        """
         total_distance = 0
         for i in range(len(path) - 1):
             node1, node2 = path[i], path[i + 1]

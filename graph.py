@@ -3,18 +3,31 @@ from Customer import *
 
 class Graph:
     def __init__(self, file_path, rho = 0.1):
+        """
+        Constructor for the class
+        :param file_path: path of the file
+        :param rho: pheromone evaporation rate
+        """
         super()
+        # pheromone evaporation rate
         self.rho = rho
         self.customer_numbers, self.customers, self.customer_distance_matrix, self.vehicle_number, self.vehicle_capacity \
             = self.create_customer(file_path)
-        self.nearest_travel_path, self.pheromone_value, _ = self.nearest_heuristic()
+        self.nearest_travel_path, self.pheromone_value = self.nearest_heuristic()
+        # initial pheromone value
         self.pheromone_value = (1/self.pheromone_value * self.customer_numbers)
-
+        # pheromone matrix for the ACO graph
         self.pheromone_matrix = np.ones((self.customer_numbers, self.customer_numbers)) * self.pheromone_value
+        # Closeness (n_ij)
         self.information_matrix = 1/ self.customer_distance_matrix
 
 
     def create_customer(self, file_path):
+        """
+        Calculates the customer and vehicle information from the file
+        :param file_path: path of the file
+        :return: returns customer and vehicle information
+        """
         customer_list = []
         with open(file_path, 'rt') as f:
             count = 1
@@ -38,6 +51,13 @@ class Graph:
 
     @staticmethod
     def calculate_distance_matrix(customer_numbers, customer_distance_matrix, customers):
+        """
+        Fills the distance between customers in customer distance matrix
+        :param customer_numbers: number of customers
+        :param customer_distance_matrix: customer distance matrix
+        :param customers:customers or nodes in graph
+        :return: filled customer distance matrix
+        """
         for i in range(customer_numbers):
             customer_1 = customers[i]
             customer_distance_matrix[i][i] = 1e-8
@@ -49,13 +69,25 @@ class Graph:
         return customer_distance_matrix
 
     def helper_function(self, index, time, distance):
+        """
+        Calculates the total time of distance, waiting and service
+        :param index: index where ant is
+        :param time: time elapsed
+        :param distance: distance between nodes
+        :return: total time elapsed
+        """
         waiting_time = max(self.customers[index].ready_time - time - distance, 0)
         service_time = self.customers[index].service_time
         all_time = distance + waiting_time + service_time
 
         return all_time
 
-    def nearest_heuristic(self,maximum_vehicle_number = None):
+    def nearest_heuristic(self,maximum_vehicle_number=None):
+        """
+        Calculates the nearest node heuristic from a current node
+        :param maximum_vehicle_number: maximum number of vehicles
+        :return: path and total distance to nearest node
+        """
         indexes = []
         index = 0
         load = 0
@@ -95,9 +127,17 @@ class Graph:
         path.append(0)
         vehicle_number = path.count(0) - 1
 
-        return path, total_distance, vehicle_number
+        return path, total_distance
 
     def calculate_nearest_index(self, indexes, index, load, time):
+        """
+        Calculates the nearest index to the current one
+        :param indexes: all the nodes in graph
+        :param index: current index
+        :param load: load
+        :param time: time
+        :return: nearest index or node to the current one
+        """
         nearest_index = None
         nearest_distance = None
 
@@ -120,12 +160,30 @@ class Graph:
 
     @staticmethod
     def calculate_distance(customer_1, customer_2):
+        """
+        Calculates distance between two customers or nodes
+        :param customer_1: first customer (C_i)
+        :param customer_2: second customer (C_j)
+        :return: distance between customers or nodes
+        """
         return np.linalg.norm((customer_1.x - customer_2.x, customer_1.y - customer_2.y))
 
     def update_local_pheromone(self, i, j):
+        """
+        Updates the pheromone density between two nodes or customers in an arc
+        :param i: index of first node or customer
+        :param j:index of second node or customer
+        :return: updated pheromone density between two nodes
+        """
         self.pheromone_matrix[i][j] = (1-self.rho) * self.pheromone_matrix[i][j] + self.rho * self.pheromone_value
 
     def update_global_pheromone(self, path, distance):
+        """
+        Updates the pheromone value when the ants retrace the same tour backwards
+        :param path: the path taken to destination
+        :param distance: total distance of the path
+        :return:
+        """
         pheromone_increase = self.rho/distance
         self.pheromone_matrix *= (1-self.rho)
 
