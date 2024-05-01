@@ -63,10 +63,10 @@ class ACO:
     def ant_colony_optimization(self):
         """
         Implements the ant colony algorithm
-        :return: None
+        :return: best distance,best vehicle number
         """
-        print('----------------------------------------------------')
-        print('| Iteration |          Distance          |   Time  |')
+        print('-----------------------------------------------------')
+        print('| Iteration |          Distance          |   Time   |')
         print('-----------------------------------------------------')
         start_time = time.time()
         # The maximum number of iterations
@@ -116,6 +116,8 @@ class ACO:
         print(f'Final best path distance is: {self.best_distance}')
         print(f'Number of vehicles is: {self.best_vehicle_number}')
         print(f'Algorithm runtime: {time.time() - start_time:.3f} seconds')
+
+        return self.best_distance, self.best_vehicle_number
 
 
 
