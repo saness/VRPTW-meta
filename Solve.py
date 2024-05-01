@@ -184,9 +184,12 @@ class ACO:
         for i in range(1, len(route) - 2):
             for j in range(i + 1, len(route)):
                 new_route = route.copy()
+                # reverse a route in path
                 new_route[i:j] = reversed(new_route[i:j])
+                # evaluate new route
                 new_distance = self.calculate_route_distance(new_route, distance_matrix)
 
+                # compare current and new route
                 if new_distance < best_distance:
                     best_route = new_route
                     best_distance = new_distance
@@ -219,9 +222,11 @@ class ACO:
             improved_routes = []
 
             for route in routes:
+                # apply two opt algorithm
                 improved_route, improved_distance = self.two_opt_move(route, distance_matrix)
                 improved_routes.append(improved_route)
 
+            # combine all routes to path
             ant.path = self.flatten_routes(improved_routes)
             ant.total_distance = self.calculate_path_distance(ant.path, distance_matrix)
 
