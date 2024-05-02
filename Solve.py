@@ -107,9 +107,9 @@ class ACO:
             # Update pheromone table
             self.graph.update_global_pheromone(self.best_path, self.best_distance)
 
-            if iter - start_iteration > 500:
+            if iter - start_iteration > 300:
                 print('\n')
-                print('Cannot find better solution in %d iteration' % 500)
+                print('Cannot find better solution in %d iteration' % 300)
                 break
 
         print('\n')
