@@ -104,7 +104,7 @@ class ACO:
 
             # local search procedure to refine the paths and distance found by the ants
             self.apply_local_search(ants, self.graph.customer_distance_matrix)
-            # Update pheromone table
+            # Update global pheromone
             self.graph.update_global_pheromone(self.best_path, self.best_distance)
 
             if iter - start_iteration > 300:
