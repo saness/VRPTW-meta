@@ -5,7 +5,7 @@ from Solve import ACO
 
 
 if __name__ == '__main__':
-    file_path = './solomon-100/rc205.txt'
+    file_path = './solomon-100/In/c101.txt'
     ants = 20
     maximum_iteration = 10000
     beta = 2

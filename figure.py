@@ -34,7 +34,7 @@ def plot_customers_and_routes(customers, routes, filename):
     # Plot depot
     depot_x = customers[0].x  # First route, first customer
     depot_y = customers[0].y
-    plt.scatter(depot_x, depot_y, color='red', label='Depot')
+    plt.scatter(depot_x, depot_y, color='gold', label='Depot')
 
     # Plot routes
     for i, route in enumerate(routes):
