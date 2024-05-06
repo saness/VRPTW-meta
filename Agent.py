@@ -1,6 +1,3 @@
-import copy
-from threading import Event
-
 from graph import Graph
 
 

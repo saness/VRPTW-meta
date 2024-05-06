@@ -1,11 +1,9 @@
-import copy
-
 import numpy as np
 import random
 
 from graph import Graph
 from Agent import Agent
-from threading import Thread, Event
+from figure import plot_customers_and_routes
 import time
 
 
@@ -39,7 +37,7 @@ class ACO:
         # least number of vehicles
         self.best_vehicle_number = None
 
-    def find_best_path(self, paths_distance, ants, start_iteration, iter, start_time):
+    def find_best_path(self, paths_distance, ants, start_iteration, iter, start_time, i):
         """
         Finds the best path and its corresponding distance
         :param paths_distance: the total distance travelled by ants
@@ -49,6 +47,7 @@ class ACO:
         :param start_time: the starting time
         :return: best path, distance and start iteration
         """
+
         best_index = np.argmin(paths_distance)
         if self.best_path is None or paths_distance[best_index] < self.best_distance:
             best_ant = ants[int(best_index)]
@@ -56,9 +55,12 @@ class ACO:
             self.best_vehicle_number = self.best_path.count(0) - 1
             start_iteration = iter
             time_running = time.time() - start_time
+            # creating images
+            plot_customers_and_routes(self.graph.customers, self.best_path, "image.{i}.png".format(i=i))
+            i += 1
             print("|     {}     |      {}     |   {:.3f}  |".format(iter, self.best_distance, time_running))
 
-        return self.best_path, self.best_distance, start_iteration
+        return self.best_path, self.best_distance, start_iteration, i
 
     def ant_colony_optimization(self):
         """
@@ -71,6 +73,7 @@ class ACO:
         start_time = time.time()
         # The maximum number of iterations
         start_iteration = 0
+        i = 0
         for iter in range(self.maximum_iteration):
             # initializing the ants
             ants = []
@@ -99,13 +102,15 @@ class ACO:
             paths_distance = np.array(list(map(lambda ant: ant.total_distance, ants)))
 
             # Record the current best path
-            self.best_path,self.best_distance, start_iteration \
-                = self.find_best_path(paths_distance, ants, start_iteration, iter, start_time)
+            self.best_path,self.best_distance, start_iteration, i \
+                = self.find_best_path(paths_distance, ants, start_iteration, iter, start_time, i)
 
             # local search procedure to refine the paths and distance found by the ants
             self.apply_local_search(ants, self.graph.customer_distance_matrix)
+
             # Update global pheromone
             self.graph.update_global_pheromone(self.best_path, self.best_distance)
+
 
             if iter - start_iteration > 300:
                 print('\n')
@@ -276,3 +281,8 @@ class ACO:
             node1, node2 = path[i], path[i + 1]
             total_distance += distance_matrix[node1][node2]
         return total_distance
+
+
+
+
+
