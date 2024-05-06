@@ -1,3 +1,10 @@
+"""
+file: Solve.py
+description: This program consists of implementation of Ant Colony Optimization and local saerch procedure
+language: python3
+author: Sanish Suwal(ss4657@rit.edu), Jay Nair(an1147@rit.edu), Bhavdeep Khileri(bk2281@rit.edu)
+"""
+
 import numpy as np
 import random
 

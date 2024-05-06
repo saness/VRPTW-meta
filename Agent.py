@@ -1,3 +1,10 @@
+"""
+file: Agent.py
+description: This program consists of blueprint for search agent i.e ant or vehicle
+language: python3
+author: Sanish Suwal(ss4657@rit.edu), Jay Nair(an1147@rit.edu), Bhavdeep Khileri(bk2281@rit.edu)
+"""
+
 from graph import Graph
 
 

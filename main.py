@@ -1,3 +1,9 @@
+"""
+file: main.py
+description: This program is the main program. Run this file to run the program.
+language: python3
+author: Sanish Suwal(ss4657@rit.edu), Jay Nair(an1147@rit.edu), Bhavdeep Khileri(bk2281@rit.edu)
+"""
 import numpy as np
 
 from graph import Graph

@@ -1,3 +1,10 @@
+"""
+file: figure.py
+description: This program creates plots or graphs found by vehicles or ants
+language: python3
+author: Sanish Suwal(ss4657@rit.edu), Jay Nair(an1147@rit.edu), Bhavdeep Khileri(bk2281@rit.edu)
+"""
+
 import os
 
 from matplotlib import pyplot as plt

@@ -1,3 +1,10 @@
+"""
+file: creategif.py
+description: This program creates gif from a collection of images
+language: python3
+author: Sanish Suwal(ss4657@rit.edu), Jay Nair(an1147@rit.edu), Bhavdeep Khileri(bk2281@rit.edu)
+"""
+
 import os
 import re
 import imageio

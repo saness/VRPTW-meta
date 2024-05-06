@@ -1,3 +1,10 @@
+"""
+file: Customer.py
+description: This program is blueprint for a customer node.
+language: python3
+author: Sanish Suwal(ss4657@rit.edu), Jay Nair(an1147@rit.edu), Bhavdeep Khileri(bk2281@rit.edu)
+"""
+
 class Customer:
     def __init__(self, id, x, y, demand, ready_time, due_date, service_time):
         """
