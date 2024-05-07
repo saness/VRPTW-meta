@@ -16,7 +16,7 @@ if __name__ == '__main__':
     maximum_iteration = 10000
     beta = 2
     q0 = 0.1
-    num_trails = 30
+    num_trails = 1
     distance_list = np.zeros(num_trails)
     vehicle_list = np.zeros(num_trails)
 
