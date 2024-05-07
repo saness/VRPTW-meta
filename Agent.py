@@ -6,7 +6,7 @@ author: Sanish Suwal(ss4657@rit.edu), Jay Nair(an1147@rit.edu), Bhavdeep Khileri
 """
 
 from graph import Graph
-
+from utils import helper_function
 
 class Agent:
     def __init__(self, graph: Graph, start= 0):
@@ -32,17 +32,7 @@ class Agent:
         # total travel distance
         self.total_distance = 0
 
-    def helper_function(self, next_index, distance):
-        """
-        Calculates the total time of distance, waiting and service
-        :param next_index: index where ant is
-        :param distance: distance between nodes
-        :return: total time elapsed
-        """
-        service_time = self.graph.customers[next_index].service_time
-        waiting_time = max(self.graph.customers[next_index].ready_time - self.time - distance, 0)
-        all_time = distance + waiting_time + service_time
-        return all_time
+
 
     def travel_to_next(self, next_index):
         """
@@ -63,7 +53,7 @@ class Agent:
         # Update vehicle load, travel distance, time
         else:
             self.load += self.graph.customers[next_index].demand
-            all_time = self.helper_function(next_index, distance)
+            all_time = helper_function(next_index, distance, self.graph, self.time)
             self.time += all_time
             self.indexes.remove(next_index)
 
@@ -80,7 +70,7 @@ class Agent:
             return False
 
         distance = self.graph.customer_distance_matrix[self.index][next_index]
-        all_time = self.helper_function(next_index, distance)
+        all_time = helper_function(next_index, distance, self.graph, self.time)
 
         total_time = self.time + all_time + self.graph.customer_distance_matrix[next_index][0]
         due_time = self.graph.customers[0].due_date
