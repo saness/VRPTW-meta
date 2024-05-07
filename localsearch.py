@@ -4,11 +4,11 @@ description: This program consists of implementation of local search procedure
 language: python3
 author: Sanish Suwal(ss4657@rit.edu), Jay Nair(an1147@rit.edu), Bhavdeep Khileri(bk2281@rit.edu)
 """
-def apply_local_search(ants, distance_matrix):
+def apply_local_search(ants, customer_distance_matrix):
     """
     Applies local search procedure to all ants after the tour is complete
     :param ants: ants
-    :param distance_matrix: distance matrix
+    :param customer_distance_matrix: distance matrix
     :return: None
     """
     for ant in ants:
@@ -18,12 +18,12 @@ def apply_local_search(ants, distance_matrix):
 
         for route in routes:
             # apply two opt algorithm
-            improved_route, improved_distance = two_opt_move(route, distance_matrix)
+            improved_route, improved_distance = two_opt_move(route, customer_distance_matrix)
             improved_routes.append(improved_route)
 
         # combine all routes to path
         ant.path = flatten_routes(improved_routes)
-        ant.total_distance = calculate_path_distance(ant.path, distance_matrix)
+        ant.total_distance = calculate_path_distance(ant.path, customer_distance_matrix)
 
 
 def get_routes_from_path(path):
@@ -59,29 +59,29 @@ def flatten_routes(routes):
     return flattened_path[:-1]
 
 
-def calculate_path_distance(path, distance_matrix):
+def calculate_path_distance(path, customer_distance_matrix):
     """
     Calculates the total distance of the given path by summing the distances between consecutive nodes in the path,
     :param path: path
-    :param distance_matrix: distance matrix
+    :param customer_distance_matrix: distance matrix
     :return:
     """
     total_distance = 0
     for i in range(len(path) - 1):
         node1, node2 = path[i], path[i + 1]
-        total_distance += distance_matrix[node1][node2]
+        total_distance += customer_distance_matrix[node1][node2]
     return total_distance
 
-def two_opt_move(route, distance_matrix):
+def two_opt_move(route, customer_distance_matrix):
     """
     Tries all 2 opt moves in the route and returns the best route and its corresponding distance
     Removes two non-adjacent edges from a route and reconnects the two resulting sub-routes in the opposite order.
     :param route: route
-    :param distance_matrix: the distance matrix
+    :param customer_distance_matrix: the distance matrix
     :return: best route and its corresponding distance
     """
     best_route = route.copy()
-    best_distance = calculate_route_distance(best_route, distance_matrix)
+    best_distance = calculate_route_distance(best_route, customer_distance_matrix)
 
     for i in range(1, len(route) - 2):
         for j in range(i + 1, len(route)):
@@ -89,7 +89,7 @@ def two_opt_move(route, distance_matrix):
             # reverse a route in path
             new_route[i:j] = reversed(new_route[i:j])
             # evaluate new route
-            new_distance = calculate_route_distance(new_route, distance_matrix)
+            new_distance = calculate_route_distance(new_route, customer_distance_matrix)
 
             # compare current and new route
             if new_distance < best_distance:
@@ -98,15 +98,15 @@ def two_opt_move(route, distance_matrix):
 
     return best_route, best_distance
 
-def calculate_route_distance(route, distance_matrix):
+def calculate_route_distance(route, customer_distance_matrix):
     """
     Calculate the total distance of given route,
     :param route: route
-    :param distance_matrix: distance matrix
+    :param customer_distance_matrix: distance matrix
     :return:total distance
     """
     total_distance = 0
     for i in range(len(route) - 1):
         node1, node2 = route[i], route[i + 1]
-        total_distance += distance_matrix[node1][node2]
+        total_distance += customer_distance_matrix[node1][node2]
     return total_distance
