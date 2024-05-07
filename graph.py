@@ -46,14 +46,24 @@ class Graph:
                 count += 1
         customer_numbers = len(customer_list)
         customers = []
-        for customer in customer_list:
-            customers.append(Customer(int(customer[0]), float(customer[1]), float(customer[2]), float(customer[3]),
-                                      float(customer[4]), float(customer[5]), float(customer[6])))
+
+        self.add_customer_to_list(customers, customer_list)
 
         customer_distance_matrix = np.zeros((customer_numbers, customer_numbers))
         customer_distance_matrix = Graph.calculate_distance_matrix(customer_numbers, customer_distance_matrix, customers)
 
         return customer_numbers, customers, customer_distance_matrix, vehicle_number, vehicle_capacity
+
+    def add_customer_to_list(self, customers, customer_list):
+        """
+        Adds customer details  to customer list as Customer class
+        :param customers: list of customers as Customer node
+        :param customer_list: list of extracted customer details from dataset
+        :return:
+        """
+        for customer in customer_list:
+            customers.append(Customer(int(customer[0]), float(customer[1]), float(customer[2]), float(customer[3]),
+                                      float(customer[4]), float(customer[5]), float(customer[6])))
 
     @staticmethod
     def calculate_distance_matrix(customer_numbers, customer_distance_matrix, customers):
