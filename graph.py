@@ -27,7 +27,7 @@ class Graph:
         # Closeness (n_ij)
         self.information_matrix = 1/ self.customer_distance_matrix
 
-
+    @staticmethod
     def create_customer(self, file_path):
         """
         Calculates the customer and vehicle information from the file
@@ -47,14 +47,15 @@ class Graph:
         customer_numbers = len(customer_list)
         customers = []
 
-        self.add_customer_to_list(customers, customer_list)
+        self.create_customer_nodes(customers, customer_list)
 
         customer_distance_matrix = np.zeros((customer_numbers, customer_numbers))
         customer_distance_matrix = Graph.calculate_distance_matrix(customer_numbers, customer_distance_matrix, customers)
 
         return customer_numbers, customers, customer_distance_matrix, vehicle_number, vehicle_capacity
 
-    def add_customer_to_list(self, customers, customer_list):
+    @staticmethod
+    def create_customer_nodes(customers, customer_list):
         """
         Adds customer details  to customer list as Customer class
         :param customers: list of customers as Customer node
