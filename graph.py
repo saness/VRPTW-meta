@@ -4,9 +4,8 @@ description: This program is a blueprint for Graph to implement the Ant Colony O
 language: python3
 author: Sanish Suwal(ss4657@rit.edu), Jay Nair(an1147@rit.edu), Bhavdeep Khileri(bk2281@rit.edu)
 """
-import numpy as np
-from Customer import *
 from dataextract import *
+from utils import helper_function_two
 
 class Graph:
     def __init__(self, file_path, rho = 0.1):
@@ -29,19 +28,6 @@ class Graph:
         self.information_matrix = 1/ self.customer_distance_matrix
 
 
-    def helper_function(self, index, time, distance):
-        """
-        Calculates the total time of distance, waiting and service
-        :param index: index where ant is
-        :param time: time elapsed
-        :param distance: distance between nodes
-        :return: total time elapsed
-        """
-        waiting_time = max(self.customers[index].ready_time - time - distance, 0)
-        service_time = self.customers[index].service_time
-        all_time = distance + waiting_time + service_time
-
-        return all_time
 
     def nearest_heuristic(self,maximum_vehicle_number=None):
         """
@@ -74,7 +60,7 @@ class Graph:
                 load += self.customers[closest_index].demand
                 distance = self.customer_distance_matrix[index][closest_index]
 
-                all_time = self.helper_function(closest_index, time, distance)
+                all_time = helper_function_two(closest_index, time, distance, self.customers)
                 time += all_time
 
                 total_distance += self.customer_distance_matrix[index][closest_index]
@@ -115,7 +101,7 @@ class Graph:
                 continue
 
             distance = self.customer_distance_matrix[index][i]
-            all_time = self.helper_function(i, time, distance)
+            all_time = helper_function_two(i, time, distance, self.customers)
             total_time = time + all_time + self.customer_distance_matrix[i][0]
             # Checks if you can return to service store after visiting a passenger or
             # Checks if the vehicle reaches after due time
