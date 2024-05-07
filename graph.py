@@ -100,7 +100,7 @@ class Graph:
 
     def nearest_heuristic(self,maximum_vehicle_number=None):
         """
-        Calculates the nearest node heuristic from a current node
+        Calculates the closest node heuristic from a current node
         :param maximum_vehicle_number: maximum number of vehicles
         :return: path and total distance to nearest node
         """
@@ -123,22 +123,22 @@ class Graph:
             maximum_vehicle_number = self.customer_numbers
 
         while len(indexes) > 0 and maximum_vehicle_number > 0:
-            nearest_index = self.calculate_nearest_index(indexes, index, load, time)
+            closest_index = self.calculate_closest_index(indexes, index, load, time)
 
-            if nearest_index is not None:
-                load += self.customers[nearest_index].demand
-                distance = self.customer_distance_matrix[index][nearest_index]
+            if closest_index is not None:
+                load += self.customers[closest_index].demand
+                distance = self.customer_distance_matrix[index][closest_index]
 
-                all_time = self.helper_function(nearest_index, time, distance)
+                all_time = self.helper_function(closest_index, time, distance)
                 time += all_time
 
-                total_distance += self.customer_distance_matrix[index][nearest_index]
+                total_distance += self.customer_distance_matrix[index][closest_index]
                 # add node to path
-                path.append(nearest_index)
+                path.append(closest_index)
                 # change the current index to nearest node
-                index = nearest_index
+                index = closest_index
                 # remove visited index
-                indexes.remove(nearest_index)
+                indexes.remove(closest_index)
             else:
                 total_distance += self.customer_distance_matrix[index][0]
                 load = 0
@@ -153,17 +153,17 @@ class Graph:
 
         return path, total_distance
 
-    def calculate_nearest_index(self, indexes, index, load, time):
+    def calculate_closest_index(self, indexes, index, load, time):
         """
-        Calculates the nearest index to the current one
+        Calculates the closest index to the current one
         :param indexes: all the nodes in graph
         :param index: current index
         :param load: load
         :param time: time
         :return: nearest index or node to the current one
         """
-        nearest_index = None
-        nearest_distance = None
+        closest_index = None
+        closest_distance = None
 
         for i in indexes:
             if load + self.customers[i].demand > self.vehicle_capacity:
@@ -178,11 +178,11 @@ class Graph:
                 continue
 
             # comparing nearest node with current next node
-            if nearest_distance is None or self.customer_distance_matrix[index][i] < nearest_distance:
-                nearest_distance = self.customer_distance_matrix[index][i]
-                nearest_index = i
+            if closest_distance is None or self.customer_distance_matrix[index][i] < closest_distance:
+                closest_distance = self.customer_distance_matrix[index][i]
+                closest_index = i
 
-        return nearest_index
+        return closest_index
 
     @staticmethod
     def calculate_distance(customer_1, customer_2):
