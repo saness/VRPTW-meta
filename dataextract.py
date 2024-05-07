@@ -1,3 +1,9 @@
+"""
+file: dataextraxt.py
+description: This program extracts the data from dataset and creates customer nodes and vehicle details
+language: python3
+author: Sanish Suwal(ss4657@rit.edu), Jay Nair(an1147@rit.edu), Bhavdeep Khileri(bk2281@rit.edu)
+"""
 import numpy as np
 
 from Customer import *
