@@ -14,15 +14,15 @@ def apply_local_search(ants, customer_distance_matrix):
     for ant in ants:
         path = ant.path
         routes = get_routes_from_path(path)
-        improved_routes = []
+        new_routes = []
 
         for route in routes:
             # apply two opt algorithm
-            improved_route, improved_distance = two_opt_move(route, customer_distance_matrix)
-            improved_routes.append(improved_route)
+            new_route, improved_distance = two_opt_move(route, customer_distance_matrix)
+            new_routes.append(new_route)
 
         # combine all routes to path
-        ant.path = flatten_routes(improved_routes)
+        ant.path = flatten_routes(new_routes)
         ant.total_distance = calculate_path_distance(ant.path, customer_distance_matrix)
 
 
