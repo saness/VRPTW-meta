@@ -32,21 +32,21 @@ def plot_customers_and_routes(customers, routes, filename):
         'teal', 'lavender', 'brown', 'beige', 'maroon', 'turquoise', 'olive', 'hotpink', 'navy', 'grey',
         'black', 'white', 'crimson', 'turquoise', 'indigo', 'silver', 'gold', 'violet', 'tan', 'rosybrown']
     # Extract customer coordinates
-    x_coords = [customer.x for customer in customers]
-    y_coords = [customer.y for customer in customers]
+    x_coords = [customer.x_coordinate for customer in customers]
+    y_coords = [customer.y_coordinate for customer in customers]
 
     # Plot customers
     plt.scatter(x_coords, y_coords, color='blue')
 
     # Plot depot
-    depot_x = customers[0].x  # First route, first customer
-    depot_y = customers[0].y
+    depot_x = customers[0].x_coordinate  # First route, first customer
+    depot_y = customers[0].y_coordinate
     plt.scatter(depot_x, depot_y, color='gold', label='Depot')
 
     # Plot routes
     for i, route in enumerate(routes):
-        route_x = [depot_x] + [customers[customer].x for customer in route] + [depot_x]
-        route_y = [depot_y] + [customers[customer].y for customer in route] + [depot_y]
+        route_x = [depot_x] + [customers[customer].x_coordinate for customer in route] + [depot_x]
+        route_y = [depot_y] + [customers[customer].y_coordinate for customer in route] + [depot_y]
         plt.plot(route_x, route_y, marker='o', color=colors[i])
 
     plt.xlabel('X Coordinate')

@@ -6,7 +6,7 @@ author: Sanish Suwal(ss4657@rit.edu), Jay Nair(an1147@rit.edu), Bhavdeep Khileri
 """
 
 class Customer:
-    def __init__(self, id, x, y, demand, ready_time, due_date, service_time):
+    def __init__(self, id, x_coordinate, y_coordinate, demand, ready_time, due_date, service_time):
         """
         Constructor for Customer class
         :param id: customer id
@@ -19,8 +19,8 @@ class Customer:
         """
         super()
         self.id = id
-        self.x = x
-        self.y = y
+        self.x_coordinate = x_coordinate
+        self.y_coordinate = y_coordinate
         self.demand = demand
         self.ready_time = ready_time
         self.due_date = due_date

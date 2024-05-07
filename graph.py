@@ -192,7 +192,7 @@ class Graph:
         :param customer_2: second customer (C_j)
         :return: distance between customers or nodes
         """
-        return np.linalg.norm((customer_1.x - customer_2.x, customer_1.y - customer_2.y))
+        return np.linalg.norm((customer_1.x_coordinate - customer_2.x_coordinate, customer_1.y_coordinate - customer_2.y_coordinate))
 
     def update_local_pheromone(self, i, j):
         """
